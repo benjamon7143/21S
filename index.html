@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title> ❤️❤️ 🌻 Para Mi Chini ❤️❤️ </title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/brython@3.12.0/brython.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/brython@3.12.0/brython_stdlib.js"></script>
+</head>
+<body onload="brython()">
+    <!-- Interfaz inicialhq -->
+    <div class="initial-interface" id="initialInterface">
+        <h1>Te Quiero Mucho ❤️❤️</h1>
+        <h1>🌻</h1>
+        <h1>   Para Mi Chini ❤️</h1>
+        
+        <button onclick="startDrawing()">DIBUJAR ❤️</button>
+        
+        <div class="speed-control">
+            <div class="speed-label">Velocidad:</div>
+            <input type="range" class="speed-slider" id="speedSlider" min="1" max="10" value="5">
+            <div class="speed-value" id="speedValue">5</div>
+        </div>
+    </div>
+
+    <!-- Interfaz de dibujo -->
+    <div class="drawing-interface" id="drawingInterface">
+        <div class="canvas-container">
+            <canvas id="turtleCanvas" width="1000" height="1000"></canvas>
+        </div>
+        <div class="smile-text" id="smileText" style="margin: 10px;">
+             
+        </div>
+    </div>
+
+    <script type="text/python">
+        from browser import document, window
+        from browser.timer import set_timeout, clear_timeout
+        import math
+        
+        # Variables globales
+        drawing_active = False
+        current_petal = 0
+        current_segment = 0
+        drawing_timeout = None
+        drawing_speed = 5  # Velocidad por defecto (1-10)
+        
+        # Canvas setup
+        canvas = document['turtleCanvas']
+        ctx = canvas.getContext('2d')
+        canvas_width = 1000
+        canvas_height = 1000
+        
+        # Turtle variables
+        turtle_x = canvas_width // 2
+        turtle_y = canvas_height // 2
+        turtle_heading = 0
+        turtle_pen_down = True
+        
+        def clear_canvas():
+            """Limpia el canvas y lo pinta de negro"""
+            ctx.clearRect(0, 0, canvas_width, canvas_height)
+            ctx.fillStyle = 'black'
+            ctx.fillRect(0, 0, canvas_width, canvas_height)
+        
+        def set_color(color_str):
+            """Establece el color del trazo"""
+            ctx.strokeStyle = color_str
+            ctx.fillStyle = color_str
+            ctx.lineWidth = 3
+        
+        def pen_up():
+            """Levanta el lápiz"""
+            global turtle_pen_down
+            turtle_pen_down = False
+        
+        def pen_down():
+            """Baja el lápiz"""
+            global turtle_pen_down
+            turtle_pen_down = True
+        
+        def goto(x, y):
+            """Mueve la tortuga a una posición específica"""
+            global turtle_x, turtle_y
+            
+            # Escalar coordenadas para que quepan en el canvas (más grande)
+            scale_factor = min(canvas_width, canvas_height) / 300
+            scaled_x = canvas_width // 2 + x * scale_factor
+            scaled_y = canvas_height // 2 - y * scale_factor
+            
+            if turtle_pen_down:
+                ctx.lineTo(scaled_x, scaled_y)
+                ctx.stroke()
+            else:
+                ctx.moveTo(scaled_x, scaled_y)
+            
+            turtle_x = scaled_x
+            turtle_y = scaled_y
+        
+        def right(angle):
+            """Gira la tortuga a la derecha"""
+            global turtle_heading
+            turtle_heading -= angle
+        
+        def left(angle):
+            """Gira la tortuga a la izquierda"""
+            global turtle_heading
+            turtle_heading += angle
+        
+        def circle(radius, extent=None):
+            """Dibuja un arco de círculo como turtle real"""
+            global turtle_x, turtle_y, turtle_heading
+            
+            if extent is None:
+                extent = 360
+            
+            # En turtle, circle() dibuja hacia la izquierda desde la dirección actual
+            # El centro del círculo está a 90 grados a la izquierda de la tortuga
+            center_angle = turtle_heading + 90
+            center_x = turtle_x + radius * math.cos(math.radians(center_angle))
+            center_y = turtle_y + radius * math.sin(math.radians(center_angle))
+            
+            # Ángulo inicial desde el centro del círculo hasta la posición actual de la tortuga
+            start_angle = math.radians(turtle_heading - 90)
+            end_angle = start_angle + math.radians(extent)
+            
+            # Dibujar el arco
+            ctx.beginPath()
+            ctx.arc(center_x, center_y, radius, start_angle, end_angle)
+            ctx.stroke()
+            
+            # Actualizar posición de la tortuga (turtle se mueve al final del arco)
+            turtle_x = center_x + radius * math.cos(end_angle)
+            turtle_y = center_y + radius * math.sin(end_angle)
+            
+            # Actualizar heading (turtle gira según el extent)
+            turtle_heading += extent
+        
+        def draw_next():
+            """Dibuja el siguiente segmento del girasol"""
+            global current_petal, current_segment, drawing_active, drawing_timeout
+            
+            try:
+                if not drawing_active:
+                    return
+                
+                if current_petal >= 16:
+                    drawing_active = False
+                    show_smile_text()
+                    return
+                
+                if current_segment >= 18:
+                    # Completar el pétalo actual
+                    circle(40, 24)
+                    # Siguiente pétalo
+                    current_petal += 1
+                    current_segment = 0
+                    # Delay basado en velocidad (más lento = más delay)
+                    delay = max(30, 150 - (drawing_speed * 12))
+                    set_timeout(draw_next, delay)
+                    return
+                
+                # Dibujar el siguiente segmento del pétalo actual - CÓDIGO EXACTO DE 03.py
+                set_color('#FFA216')
+                right(90)
+                circle(150-current_segment*6, 90)
+                left(90)
+                circle(150-current_segment*6, 90)
+                right(180)
+                
+                # Sin mensajes de progreso - solo dibujo limpio
+                
+                current_segment += 1
+                
+                # Siguiente segmento con delay basado en velocidad
+                if drawing_active:
+                    # Velocidad 1 = muy lento, velocidad 10 = muy rápido
+                    delay = max(10, 100 - (drawing_speed * 9))
+                    drawing_timeout = set_timeout(draw_next, delay)
+                    
+            except Exception as e:
+                drawing_active = False
+        
+        def start_drawing():
+            """Inicia el dibujo del girasol"""
+            global drawing_active, current_petal, current_segment, drawing_timeout, drawing_speed
+            
+            # Obtener velocidad del slider
+            speed_slider = document['speedSlider']
+            drawing_speed = int(speed_slider.value)
+            
+            # Limpiar timeout anterior si existe
+            if drawing_timeout:
+                clear_timeout(drawing_timeout)
+            
+            # Ocultar interfaz inicial y mostrar interfaz de dibujo
+            initial_interface = document['initialInterface']
+            drawing_interface = document['drawingInterface']
+            
+            # Fade out de la interfaz inicial
+            initial_interface.classList.add('hidden')
+            
+            # Esperar un poco y luego mostrar la interfaz de dibujo
+            def show_drawing_interface():
+                drawing_interface.classList.add('active')
+            
+            set_timeout(show_drawing_interface, 400)  # Medio segundo de delay
+            
+            drawing_active = True
+            current_petal = 0
+            current_segment = 0
+            clear_canvas()
+            
+            # Posición inicial ajustada para centrado vertical
+            pen_up()
+            pen_down()
+            
+            # Iniciar dibujo después de la transición
+            def start_actual_drawing():
+                draw_next()
+            
+            set_timeout(start_actual_drawing, 800)  # Esperar a que termine la transición
+        
+        def show_smile_text():
+            """Muestra el texto 'smile :)' con efecto de escritura letra por letra"""
+            smile_element = document['smileText']
+            smile_element.classList.add('visible')
+            
+            # Dividir el texto en letras
+            text = "Las flores de hoy viajan en esta página, pero mi promesa es que un día llegarán a ti de verdad, tan amarillas y brillantes como tu son  risa 💛💛"
+            smile_element.innerHTML = ""
+            
+            for i, char in enumerate(text):
+                if char == " ":
+                    span = document.createElement('span')
+                    span.innerHTML = "&nbsp;"
+                    span.style.animationDelay = f"{i * 0.1}s"
+                    smile_element.appendChild(span)
+                else:
+                    span = document.createElement('span')
+                    span.classList.add('letter')
+                    span.text = char
+                    span.style.animationDelay = f"{i * 0.1}s"
+                    smile_element.appendChild(span)
+        
+        def update_speed_display():
+            """Actualiza la visualización del valor de velocidad"""
+            speed_slider = document['speedSlider']
+            speed_value = document['speedValue']
+            speed_value.text = speed_slider.value
+        
+        # Configurar el control de velocidad
+        speed_slider = document['speedSlider']
+        speed_slider.bind('input', lambda e: update_speed_display())
+        
+        # Exportar funciones para JavaScript
+        window.startDrawing = start_drawing
+        
+        # Inicialización
+        clear_canvas()
+        update_speed_display()  # Mostrar valor inicial de velocidad
+    </script>
+
+    <script>
+        function startDrawing() {
+            if (window.startDrawing) {
+                window.startDrawing();
+            } else {
+                document.getElementById('output').innerHTML = '<p style="color: red;">❌ Sistema aún no está listo</p>';
+            }
+        }
+    </script>
+</body>
+</html>
