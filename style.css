@@ -198,26 +198,21 @@ button:active {
 
 .smile-text {
     position: absolute;
-    top: 20%;
+    top: -0%;
     left: 50%;
     transform: translateX(-50%) translateY(20px);
-
     width: 90%;
     max-width: 900px;
     box-sizing: border-box;
     padding: 0 15px;
-
     font-family: 'Outfit', sans-serif;
     font-weight: 300;
     font-size: clamp(1.2rem, 2.5vw, 1.8rem);
     line-height: 1.5;
-
     color: #FFA216;
     text-align: center;
-
     overflow-wrap: break-word;
     word-wrap: break-word;
-
     opacity: 0;
     transition: opacity 0.5s ease, transform 0.5s ease;
     z-index: 10;
@@ -285,7 +280,7 @@ button:active {
         max-width: 650px;
         font-size: 1.3rem;
         line-height: 1.5;
-        top: 25%;
+        top: -0%;
     }
 }
 
@@ -323,7 +318,7 @@ button:active {
         max-width: 420px;
         font-size: 1.15rem;
         line-height: 1.5;
-        top: 30%;
+        top: -0%;
         padding: 0 10px;
     }
 }
@@ -352,7 +347,7 @@ button:active {
         max-width: 300px;
         font-size: 1rem;
         line-height: 1.45;
-        top: 30%;
+        top: -0%;
         padding: 0 5px;
     }
 }
